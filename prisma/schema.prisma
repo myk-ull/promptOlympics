@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication
+model User {
+  id            String       @id @default(cuid())
+  email         String       @unique
+  username      String       @unique
+  password      String       // Hashed password
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  
+  // Relations
+  submissions   Submission[]
+  leaderboards  DailyLeaderboard[]
+  sessions      Session[]
+}
+
+// Session model for auth
+model Session {
+  id            String   @id @default(cuid())
+  userId        String
+  token         String   @unique
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([token])
+}
+
+// Daily puzzles
+model Puzzle {
+  id                    Int                @id @default(autoincrement())
+  date                  DateTime           @unique @db.Date
+  targetImageUrl        String
+  targetImageDescription String?
+  difficultyLevel       Int                @default(1) // 1-5 scale
+  createdAt             DateTime           @default(now())
+  
+  // Relations
+  submissions           Submission[]
+  leaderboards          DailyLeaderboard[]
+}
+
+// User submissions
+model Submission {
+  id                String             @id @default(cuid())
+  userId            String
+  puzzleId          Int
+  promptText        String
+  wordCount         Int
+  generatedImageUrl String?
+  scores            Json?              // {clip: 0.85, objects: 0.7, colors: 0.9, pose: 0.6, final: 82}
+  finalScore        Int?
+  attempts          Int                @default(1)
+  createdAt         DateTime           @default(now())
+  
+  // Relations
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  puzzle            Puzzle             @relation(fields: [puzzleId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, puzzleId]) // One submission per user per puzzle
+  @@index([puzzleId])
+  @@index([userId])
+  @@index([finalScore])
+}
+
+// Daily leaderboards
+model DailyLeaderboard {
+  id          String       @id @default(cuid())
+  puzzleId    Int
+  userId      String
+  score       Int
+  rank        Int
+  createdAt   DateTime     @default(now())
+  
+  // Relations
+  puzzle      Puzzle       @relation(fields: [puzzleId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([puzzleId, userId])
+  @@index([puzzleId, score])
+  @@index([userId])
+}
