@@ -35,7 +35,7 @@ export function EmailConfirmation({ email, onClose }: EmailConfirmationProps) {
           </h2>
           
           <p className="text-gray-600 mb-6">
-            We've sent a confirmation email to:
+            We&apos;ve sent a confirmation email to:
             <br />
             <span className="font-semibold text-gray-900">{email}</span>
           </p>
@@ -52,7 +52,7 @@ export function EmailConfirmation({ email, onClose }: EmailConfirmationProps) {
               disabled={resendStatus === 'sending'}
               className="w-full px-4 py-2 text-sm text-blue-600 hover:text-blue-700 disabled:text-gray-400 transition-colors"
             >
-              {resendStatus === 'idle' && "Didn't receive an email? Resend"}
+              {resendStatus === 'idle' && "Didn&apos;t receive an email? Resend"}
               {resendStatus === 'sending' && "Sending..."}
               {resendStatus === 'sent' && "Email sent! Check your inbox"}
             </button>
@@ -66,7 +66,7 @@ export function EmailConfirmation({ email, onClose }: EmailConfirmationProps) {
           </div>
 
           <p className="text-xs text-gray-500 mt-4">
-            Make sure to check your spam folder if you don't see the email
+            Make sure to check your spam folder if you don&apos;t see the email
           </p>
         </div>
       </div>
