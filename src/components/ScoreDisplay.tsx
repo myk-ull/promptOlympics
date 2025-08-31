@@ -40,25 +40,25 @@ export function ScoreDisplay({ targetImage, generatedImage, scores, promptUsed }
   };
 
   return (
-    <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+    <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto' }}>
       {/* Score Header */}
-      <div className="text-center mb-6">
-        <div className="mb-2">
+      <div className="text-center mb-8">
+        <div className="mb-3">
           <span 
-            className="text-3xl font-bold"
-            style={{ fontSize: '4rem', color: getScoreColor(scores.final) }}
+            className="font-extrabold"
+            style={{ fontSize: '5rem', lineHeight: 1, color: getScoreColor(scores.final) }}
           >
             {scores.final}
           </span>
-          <span className="text-2xl opacity-60">/100</span>
+          <span className="text-3xl" style={{ color: 'var(--text-secondary)' }}>/100</span>
         </div>
-        <p className="text-xl font-medium">{getScoreMessage(scores.final)}</p>
+        <p className="text-2xl font-semibold">{getScoreMessage(scores.final)}</p>
       </div>
 
       {/* Images Comparison */}
-      <div className="grid-responsive mb-6" style={{ gap: '1rem' }}>
-        <div className="card" style={{ padding: '1rem' }}>
-          <h3 className="text-sm font-medium opacity-60 mb-2" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+      <div className="grid-responsive mb-8" style={{ gap: '2rem' }}>
+        <div className="card">
+          <h3 className="text-base font-semibold mb-4" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-secondary)' }}>
             Target
           </h3>
           <div className="image-frame">
@@ -67,8 +67,8 @@ export function ScoreDisplay({ targetImage, generatedImage, scores, promptUsed }
           </div>
         </div>
         
-        <div className="card" style={{ padding: '1rem' }}>
-          <h3 className="text-sm font-medium opacity-60 mb-2" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+        <div className="card">
+          <h3 className="text-base font-semibold mb-4" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-secondary)' }}>
             Your Result
           </h3>
           <div className="image-frame">
@@ -79,8 +79,8 @@ export function ScoreDisplay({ targetImage, generatedImage, scores, promptUsed }
       </div>
 
       {/* Stats Card */}
-      <div className="card mb-6" style={{ padding: '1.5rem' }}>
-        <h3 className="text-sm font-medium opacity-60 mb-4" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+      <div className="card mb-8">
+        <h3 className="text-base font-semibold mb-6" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-secondary)' }}>
           Score Breakdown
         </h3>
         

@@ -153,10 +153,10 @@ export function GameInterface() {
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#0a0a0a' }}>
         {/* Header */}
         <header className="header">
-          <div className="container" style={{ padding: '1rem', position: 'relative' }}>
+          <div className="container" style={{ padding: '1.5rem 1rem', position: 'relative' }}>
             <div className="text-center">
-              <h1 className="text-2xl font-bold" style={{ lineHeight: 1.2 }}>Promptle</h1>
-              <p className="text-sm opacity-60" style={{ lineHeight: 1.2 }}>Daily AI Image Challenge</p>
+              <h1 className="text-3xl font-extrabold" style={{ lineHeight: 1.2, letterSpacing: '-0.025em' }}>Promptle</h1>
+              <p className="text-sm text-secondary mt-1" style={{ lineHeight: 1.2 }}>Daily AI Image Challenge</p>
             </div>
             
             {/* Sign in button positioned in top right */}
@@ -183,21 +183,21 @@ export function GameInterface() {
         </header>
 
         {/* Main Content */}
-        <main style={{ flex: 1, padding: '2rem 0' }}>
+        <main style={{ flex: 1, padding: '3rem 0' }}>
           <div className="container">
             {!gameState.hasSubmitted ? (
               <div className="animate-fade-in">
                 {/* Desktop: Side by side, Mobile: Stacked */}
-                <div className="grid-responsive" style={{ gap: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
+                <div className="grid-responsive" style={{ gap: '3rem', maxWidth: '1100px', margin: '0 auto' }}>
                   {/* Target Image */}
                   <div>
-                    <div className="mb-3">
-                      <h2 className="text-sm font-medium opacity-60" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    <div className="mb-4">
+                      <h2 className="text-base font-semibold" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-secondary)' }}>
                         Target Image
                       </h2>
                     </div>
-                    <div className="card" style={{ padding: '1rem' }}>
-                      <div className="image-frame">
+                    <div className="card" style={{ padding: '1.5rem' }}>
+                      <div className="image-frame" style={{ borderRadius: '12px', overflow: 'hidden' }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img 
                           src={gameState.puzzle.targetImageUrl} 
@@ -209,12 +209,12 @@ export function GameInterface() {
 
                   {/* Prompt Input */}
                   <div>
-                    <div className="mb-3">
-                      <h2 className="text-sm font-medium opacity-60" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    <div className="mb-4">
+                      <h2 className="text-base font-semibold" style={{ textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-secondary)' }}>
                         Your Prompt
                       </h2>
                     </div>
-                    <div className="card" style={{ padding: '1.5rem' }}>
+                    <div className="card">
                       <PromptInput 
                         onSubmit={handlePromptSubmit}
                         isLoading={gameState.isGenerating}
