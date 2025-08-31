@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { calculateEnsembleScore } from '@/lib/scoring/ensembleScorer';
+import { calculateEnsembleScore } from '@/lib/scoring/hybridScorer';
 
 export async function POST(request: NextRequest) {
   try {

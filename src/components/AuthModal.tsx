@@ -37,7 +37,6 @@ export function AuthModal({ onSuccess }: AuthModalProps) {
         });
         if (error) throw error;
         
-        // Create user profile
         if (data.user) {
           await supabase.from('users').insert({
             id: data.user.id,
@@ -55,64 +54,80 @@ export function AuthModal({ onSuccess }: AuthModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="glass-card p-8 max-w-md w-full mx-4">
+    <div className="modal-backdrop">
+      <div className="modal animate-slide-up">
         <h2 className="text-2xl font-bold mb-6 text-center">
-          {isLogin ? 'Login' : 'Sign Up'} to Play
+          {isLogin ? 'Welcome Back' : 'Create Account'}
         </h2>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit}>
           {!isLogin && (
-            <input
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-purple-500 focus:outline-none"
-              required
-            />
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="input w-full"
+                required
+              />
+            </div>
           )}
           
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-purple-500 focus:outline-none"
-            required
-          />
+          <div className="mb-4">
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input w-full"
+              required
+            />
+          </div>
           
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-purple-500 focus:outline-none"
-            required
-          />
+          <div className="mb-4">
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input w-full"
+              required
+            />
+          </div>
           
           {error && (
-            <p className="text-red-400 text-sm">{error}</p>
+            <p className="text-sm mb-4" style={{ color: 'var(--error)' }}>
+              {error}
+            </p>
           )}
           
           <button
             type="submit"
             disabled={loading}
-            className="w-full btn-gradient"
+            className="btn btn-primary w-full mb-4"
           >
-            {loading ? 'Loading...' : (isLogin ? 'Login' : 'Sign Up')}
+            {loading ? 'Loading...' : (isLogin ? 'Sign In' : 'Sign Up')}
           </button>
         </form>
         
-        <p className="text-center mt-4 text-sm text-gray-400">
-          {isLogin ? "Don't have an account? " : "Already have an account? "}
+        <div className="text-center">
           <button
             onClick={() => setIsLogin(!isLogin)}
-            className="text-purple-400 hover:text-purple-300"
+            className="text-sm opacity-60"
+            style={{ textDecoration: 'underline' }}
           >
-            {isLogin ? 'Sign Up' : 'Login'}
+            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
           </button>
-        </p>
+        </div>
+        
+        <button
+          onClick={() => onSuccess()}
+          className="absolute"
+          style={{ top: '1rem', right: '1rem', fontSize: '1.5rem', opacity: 0.6 }}
+        >
+          ×
+        </button>
       </div>
     </div>
   );

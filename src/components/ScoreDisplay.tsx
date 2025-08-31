@@ -6,98 +6,200 @@ interface ScoreDisplayProps {
   scores: {
     similarity: number;
     final: number;
+    components?: {
+      semantic: number;
+      perceptual: number;
+      structural: number;
+    };
   };
   promptUsed?: string;
 }
 
 export function ScoreDisplay({ targetImage, generatedImage, scores, promptUsed }: ScoreDisplayProps) {
-  const similarityPercentage = scores.similarity * 100;
+  const similarityPercentage = Math.round(scores.similarity * 100);
   
-  const getScoreEmoji = (score: number) => {
-    if (score >= 90) return '🏆';
-    if (score >= 80) return '🌟';
-    if (score >= 70) return '✨';
-    if (score >= 60) return '👍';
-    if (score >= 50) return '🎯';
-    return '💪';
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return '#10b981';
+    if (score >= 60) return '#f59e0b';
+    return '#6b7280';
   };
   
   const getScoreMessage = (score: number) => {
-    if (score >= 90) return 'Outstanding! Near perfect match!';
-    if (score >= 80) return 'Excellent work! Very close!';
-    if (score >= 70) return 'Great job! Good similarity!';
-    if (score >= 60) return 'Nice effort! Getting there!';
-    if (score >= 50) return 'Good attempt! Room to improve.';
-    return 'Keep practicing! You\'ll get better!';
+    if (score >= 90) return 'Outstanding!';
+    if (score >= 80) return 'Excellent!';
+    if (score >= 70) return 'Great job!';
+    if (score >= 60) return 'Good effort!';
+    if (score >= 50) return 'Not bad!';
+    return 'Keep trying!';
+  };
+
+  const handleShare = () => {
+    const text = `I scored ${scores.final}/100 on today's Promptle!\n\nPlay at: ${window.location.origin}`;
+    navigator.clipboard.writeText(text);
+    alert('Score copied to clipboard!');
   };
 
   return (
-    <div className="space-y-6">
-      {/* Score Display */}
-      <div className="text-center p-6 bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-2xl border border-purple-500/30">
+    <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+      {/* Score Header */}
+      <div className="text-center mb-6">
         <div className="mb-2">
-          <span className="text-6xl">{getScoreEmoji(scores.final)}</span>
+          <span 
+            className="text-3xl font-bold"
+            style={{ fontSize: '4rem', color: getScoreColor(scores.final) }}
+          >
+            {scores.final}
+          </span>
+          <span className="text-2xl opacity-60">/100</span>
         </div>
-        <div className="score-display">{scores.final}</div>
-        <div className="text-gray-400 mt-2">out of 100</div>
-        <p className="text-purple-300 mt-4 text-sm">{getScoreMessage(scores.final)}</p>
+        <p className="text-xl font-medium">{getScoreMessage(scores.final)}</p>
       </div>
 
-      {/* Generated Image */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-semibold text-gray-400">Your Generated Image</h3>
-        <div className="image-container aspect-square">
-          <img 
-            src={generatedImage} 
-            alt="Generated" 
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              e.currentTarget.src = 'https://via.placeholder.com/512?text=Image+Failed';
-            }}
-          />
+      {/* Images Comparison */}
+      <div className="grid-responsive mb-6" style={{ gap: '1rem' }}>
+        <div className="card" style={{ padding: '1rem' }}>
+          <h3 className="text-sm font-medium opacity-60 mb-2" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            Target
+          </h3>
+          <div className="image-frame">
+            <img src={targetImage} alt="Target" />
+          </div>
+        </div>
+        
+        <div className="card" style={{ padding: '1rem' }}>
+          <h3 className="text-sm font-medium opacity-60 mb-2" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            Your Result
+          </h3>
+          <div className="image-frame">
+            <img src={generatedImage} alt="Generated" />
+          </div>
         </div>
       </div>
 
-      {/* Prompt Used */}
-      {promptUsed && (
-        <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-          <h4 className="text-sm font-semibold text-gray-400 mb-2">Your Prompt:</h4>
-          <p className="text-gray-300 italic text-sm">&ldquo;{promptUsed}&rdquo;</p>
-        </div>
-      )}
-
-      {/* CLIP Similarity Score */}
-      <div className="space-y-3">
-        <h4 className="text-sm font-semibold text-gray-400">Similarity Analysis</h4>
-        <div className="p-4 bg-gray-800/30 rounded-lg">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-gray-300 text-sm">CLIP Similarity</span>
-            <span className="text-purple-400 font-semibold">
-              {similarityPercentage.toFixed(1)}%
-            </span>
+      {/* Stats Card */}
+      <div className="card mb-6" style={{ padding: '1.5rem' }}>
+        <h3 className="text-sm font-medium opacity-60 mb-4" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+          Score Breakdown
+        </h3>
+        
+        {/* Component Scores */}
+        {scores.components && (
+          <>
+            {/* Semantic Score */}
+            <div className="mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm opacity-80">Content Match (What)</span>
+                <span className="font-medium">{Math.round(scores.components.semantic * 100)}%</span>
+              </div>
+              <div className="progress-bar">
+                <div 
+                  className="progress-fill"
+                  style={{ 
+                    width: `${Math.round(scores.components.semantic * 100)}%`,
+                    background: '#3b82f6'
+                  }}
+                />
+              </div>
+            </div>
+            
+            {/* Perceptual Score */}
+            <div className="mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm opacity-80">Style Match (How)</span>
+                <span className="font-medium">{Math.round(scores.components.perceptual * 100)}%</span>
+              </div>
+              <div className="progress-bar">
+                <div 
+                  className="progress-fill"
+                  style={{ 
+                    width: `${Math.round(scores.components.perceptual * 100)}%`,
+                    background: '#8b5cf6'
+                  }}
+                />
+              </div>
+            </div>
+            
+            {/* Structural Score */}
+            <div className="mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm opacity-80">Composition Match</span>
+                <span className="font-medium">{Math.round(scores.components.structural * 100)}%</span>
+              </div>
+              <div className="progress-bar">
+                <div 
+                  className="progress-fill"
+                  style={{ 
+                    width: `${Math.round(scores.components.structural * 100)}%`,
+                    background: '#f59e0b'
+                  }}
+                />
+              </div>
+            </div>
+            
+            <div style={{ paddingTop: '1rem', marginTop: '1rem', borderTop: '1px solid var(--border)' }}>
+              {/* Overall Similarity Score */}
+              <div className="mb-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm opacity-80 font-medium">Overall Similarity</span>
+                  <span className="font-bold">{similarityPercentage}%</span>
+                </div>
+                <div className="progress-bar">
+                  <div 
+                    className="progress-fill"
+                    style={{ 
+                      width: `${similarityPercentage}%`,
+                      background: getScoreColor(scores.final)
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+        
+        {!scores.components && (
+          /* Fallback for old scoring system */
+          <div className="mb-4">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm opacity-80">Overall Similarity</span>
+              <span className="font-medium">{similarityPercentage}%</span>
+            </div>
+            <div className="progress-bar">
+              <div 
+                className="progress-fill"
+                style={{ 
+                  width: `${similarityPercentage}%`,
+                  background: getScoreColor(scores.final)
+                }}
+              />
+            </div>
           </div>
-          <div className="w-full h-3 bg-gray-700 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-1000 ease-out rounded-full"
-              style={{ width: `${similarityPercentage}%` }}
-            />
+        )}
+        
+        {/* Prompt */}
+        {promptUsed && (
+          <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+            <p className="text-sm opacity-60 mb-2">Your prompt:</p>
+            <p className="text-sm" style={{ fontStyle: 'italic', color: 'var(--text-secondary)' }}>
+              "{promptUsed}"
+            </p>
           </div>
-          <p className="text-xs text-gray-500 mt-3">
-            This score measures how semantically similar your generated image is to the target using advanced AI vision models.
-          </p>
-        </div>
+        )}
       </div>
 
       {/* Action Buttons */}
       <div className="flex gap-3">
         <button 
-          onClick={() => window.location.reload()}
-          className="flex-1 py-3 px-4 bg-gray-800/50 text-gray-300 rounded-lg border border-gray-700 hover:bg-gray-700/50 transition-all duration-200 hover:scale-105 active:scale-95"
+          onClick={handleShare}
+          className="btn btn-primary flex-1"
         >
-          Try Again Tomorrow
-        </button>
-        <button className="flex-1 py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200 hover:scale-105 active:scale-95">
           Share Score
+        </button>
+        <button 
+          onClick={() => window.location.reload()}
+          className="btn btn-secondary flex-1"
+        >
+          Play Again Tomorrow
         </button>
       </div>
     </div>

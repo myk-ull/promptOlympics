@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ImageDisplay } from './ImageDisplay';
 import { PromptInput } from './PromptInput';
 import { ScoreDisplay } from './ScoreDisplay';
 import { AuthModal } from './AuthModal';
@@ -27,7 +26,6 @@ interface GameState {
   scores: ScoreBreakdown | null;
   isGenerating: boolean;
   hasSubmitted: boolean;
-  isAuthenticated: boolean;
 }
 
 export function GameInterface() {
@@ -37,8 +35,7 @@ export function GameInterface() {
     generatedImage: null,
     scores: null,
     isGenerating: false,
-    hasSubmitted: false,
-    isAuthenticated: false
+    hasSubmitted: false
   });
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -46,7 +43,6 @@ export function GameInterface() {
   useEffect(() => {
     loadDailyPuzzle();
     checkAuthentication();
-    checkExistingSubmission();
   }, []);
 
   const loadDailyPuzzle = async () => {
@@ -66,37 +62,11 @@ export function GameInterface() {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       setUser(user);
-      setGameState(prev => ({ ...prev, isAuthenticated: true }));
-    }
-  };
-
-  const checkExistingSubmission = async () => {
-    try {
-      const response = await fetch('/api/check-submission');
-      const data = await response.json();
-      
-      if (data.hasSubmission) {
-        setGameState(prev => ({
-          ...prev,
-          hasSubmitted: true,
-          generatedImage: data.submission.generatedImageUrl,
-          scores: data.submission.scores,
-          userPrompt: data.submission.promptText
-        }));
-      }
-    } catch (error) {
-      console.error('Failed to check submission:', error);
     }
   };
 
   const handlePromptSubmit = async (prompt: string) => {
     if (!gameState.puzzle) return;
-    
-    // Check if user is authenticated
-    if (!user) {
-      setShowAuthModal(true);
-      return;
-    }
     
     setGameState(prev => ({
       ...prev,
@@ -154,33 +124,15 @@ export function GameInterface() {
     } catch (error) {
       console.error('Submission error:', error);
       setGameState(prev => ({ ...prev, isGenerating: false }));
+      alert('Something went wrong. Please try again.');
     }
-  };
-
-  const getDifficultyBadge = (level: number) => {
-    const badges = {
-      1: { text: 'Easy', color: 'from-green-400 to-emerald-500' },
-      2: { text: 'Medium', color: 'from-yellow-400 to-orange-500' },
-      3: { text: 'Hard', color: 'from-red-400 to-pink-500' }
-    };
-    const badge = badges[level as keyof typeof badges] || badges[1];
-    
-    return (
-      <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${badge.color} text-white`}>
-        {badge.text}
-      </span>
-    );
   };
 
   if (!gameState.puzzle) {
     return (
-      <div className="flex items-center justify-center w-full">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4">
-            <div className="w-full h-full rounded-full border-4 border-purple-500 border-t-transparent animate-spin"></div>
-          </div>
-          <p className="text-gray-400 loading-pulse">Loading today&apos;s puzzle...</p>
-        </div>
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p className="text-sm opacity-60 mt-4">Loading puzzle...</p>
       </div>
     );
   }
@@ -194,103 +146,105 @@ export function GameInterface() {
         }} />
       )}
       
-      <div className="min-h-screen py-8 px-4">
-        <div className="max-w-7xl mx-auto">
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#0a0a0a' }}>
         {/* Header */}
-        <div className="text-center mb-8 fade-in">
-          <h1 className="text-5xl font-bold mb-2">
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              AI Prompt Challenge
-            </span>
-          </h1>
-          <p className="text-gray-400">Match the target image with your AI-generated creation</p>
-          <div className="mt-4 flex items-center justify-center gap-4">
-            <span className="text-sm text-gray-500">
-              {new Date(gameState.puzzle.date).toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}
-            </span>
-            {getDifficultyBadge(gameState.puzzle.difficultyLevel)}
+        <header className="header">
+          <div className="container" style={{ padding: '1rem', position: 'relative' }}>
+            <div className="text-center">
+              <h1 className="text-2xl font-bold" style={{ lineHeight: 1.2 }}>Promptle</h1>
+              <p className="text-sm opacity-60" style={{ lineHeight: 1.2 }}>Daily AI Image Challenge</p>
+            </div>
+            
+            {/* Sign in button positioned in top right */}
+            <div style={{ position: 'absolute', top: '50%', right: '1rem', transform: 'translateY(-50%)' }}>
+              {user ? (
+                <button
+                  onClick={() => supabase.auth.signOut().then(() => setUser(null))}
+                  className="text-sm opacity-60"
+                  style={{ textDecoration: 'none', cursor: 'pointer' }}
+                >
+                  Sign out
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className="text-sm opacity-60"
+                  style={{ textDecoration: 'none', cursor: 'pointer' }}
+                >
+                  Sign in
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        </header>
 
         {/* Main Content */}
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Target Image */}
-          <div className="glass-card p-6 slide-up">
-            <h2 className="text-xl font-semibold mb-4 text-gray-300">Target Image</h2>
-            <div className="image-container aspect-square">
-              <img 
-                src={gameState.puzzle.targetImageUrl} 
-                alt="Target" 
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  console.error('Image failed to load:', gameState.puzzle?.targetImageUrl);
-                  e.currentTarget.src = 'https://via.placeholder.com/512?text=Image+Loading+Error';
-                }}
-              />
-            </div>
-            {gameState.puzzle.targetImageDescription && (
-              <p className="mt-4 text-sm text-gray-400 italic">
-                Hint: {gameState.puzzle.targetImageDescription}
-              </p>
-            )}
-          </div>
-
-          {/* Right Side - Input or Results */}
-          <div className="glass-card p-6 slide-up" style={{ animationDelay: '0.1s' }}>
+        <main style={{ flex: 1, padding: '2rem 0' }}>
+          <div className="container">
             {!gameState.hasSubmitted ? (
-              <div>
-                <h2 className="text-xl font-semibold mb-4 text-gray-300">Your Challenge</h2>
-                <div className="space-y-4">
-                  <div className="p-4 bg-gray-800/50 rounded-lg">
-                    <p className="text-sm text-gray-400 mb-2">📝 Write a prompt to recreate the target image</p>
-                    <p className="text-sm text-gray-400 mb-2">🎯 Get scored on similarity (0-100)</p>
-                    <p className="text-sm text-gray-400">⚡ Maximum 50 words allowed</p>
-                  </div>
-                  
-                  <PromptInput 
-                    onSubmit={handlePromptSubmit}
-                    isLoading={gameState.isGenerating}
-                    maxWords={50}
-                  />
-                  
-                  {gameState.isGenerating && (
-                    <div className="mt-4 p-4 bg-purple-900/20 rounded-lg border border-purple-500/30">
-                      <div className="flex items-center gap-3">
-                        <div className="w-4 h-4 rounded-full bg-purple-500 animate-pulse"></div>
-                        <p className="text-purple-300 text-sm">Generating your image...</p>
+              <div className="animate-fade-in">
+                {/* Desktop: Side by side, Mobile: Stacked */}
+                <div className="grid-responsive" style={{ gap: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
+                  {/* Target Image */}
+                  <div>
+                    <div className="mb-3">
+                      <h2 className="text-sm font-medium opacity-60" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                        Target Image
+                      </h2>
+                    </div>
+                    <div className="card" style={{ padding: '1rem' }}>
+                      <div className="image-frame">
+                        <img 
+                          src={gameState.puzzle.targetImageUrl} 
+                          alt="Target image to recreate"
+                        />
                       </div>
                     </div>
-                  )}
+                  </div>
+
+                  {/* Prompt Input */}
+                  <div>
+                    <div className="mb-3">
+                      <h2 className="text-sm font-medium opacity-60" style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                        Your Prompt
+                      </h2>
+                    </div>
+                    <div className="card" style={{ padding: '1.5rem' }}>
+                      <PromptInput 
+                        onSubmit={handlePromptSubmit}
+                        isLoading={gameState.isGenerating}
+                        maxWords={50}
+                      />
+                      
+                      {gameState.isGenerating && (
+                        <div style={{ 
+                          marginTop: '1rem',
+                          padding: '1rem',
+                          background: 'var(--bg-primary)',
+                          borderRadius: '8px',
+                          border: '1px solid var(--border)',
+                          textAlign: 'center'
+                        }}>
+                          <div className="spinner" style={{ margin: '0 auto 0.5rem' }}></div>
+                          <p className="text-sm opacity-60">Generating your image...</p>
+                          <p className="text-sm opacity-60">This may take 10-30 seconds</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="fade-in">
-                <h2 className="text-xl font-semibold mb-4 text-gray-300">Your Result</h2>
-                <ScoreDisplay 
-                  targetImage={gameState.puzzle.targetImageUrl}
-                  generatedImage={gameState.generatedImage!}
-                  scores={gameState.scores!}
-                  promptUsed={gameState.userPrompt}
-                />
-              </div>
+              <ScoreDisplay 
+                targetImage={gameState.puzzle.targetImageUrl}
+                generatedImage={gameState.generatedImage!}
+                scores={gameState.scores!}
+                promptUsed={gameState.userPrompt}
+              />
             )}
           </div>
-        </div>
-
-        {/* Bottom Stats/Leaderboard placeholder */}
-        <div className="mt-8 glass-card p-6 fade-in" style={{ animationDelay: '0.2s' }}>
-          <h3 className="text-lg font-semibold mb-4 text-gray-300">Today&apos;s Leaderboard</h3>
-          <div className="text-center py-8 text-gray-500">
-            <p>Complete the challenge to see how you rank!</p>
-          </div>
-        </div>
+        </main>
       </div>
-    </div>
     </>
   );
 }
