@@ -9,6 +9,7 @@ export function ImageDisplay({ imageUrl, alt = "Game image" }: ImageDisplayProps
   return (
     <div className="relative w-full max-w-lg mx-auto">
       <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden shadow-lg">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img 
           src={imageUrl} 
           alt={alt}

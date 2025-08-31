@@ -30,7 +30,7 @@ export interface Submission {
   prompt_text: string;
   word_count: number;
   generated_image_url?: string;
-  scores?: any;
+  scores?: Record<string, unknown>;
   final_score?: number;
   attempts: number;
   created_at: string;

@@ -9,6 +9,7 @@ export interface ScoreBreakdown {
 }
 
 // Helper function to calculate cosine similarity between two vectors
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function cosineSimilarity(a: number[], b: number[]): number {
   if (a.length !== b.length) {
     throw new Error('Vectors must have the same length');

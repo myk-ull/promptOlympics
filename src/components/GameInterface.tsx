@@ -38,7 +38,7 @@ export function GameInterface() {
     hasSubmitted: false
   });
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
 
   useEffect(() => {
     loadDailyPuzzle();
@@ -194,6 +194,7 @@ export function GameInterface() {
                     </div>
                     <div className="card" style={{ padding: '1rem' }}>
                       <div className="image-frame">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img 
                           src={gameState.puzzle.targetImageUrl} 
                           alt="Target image to recreate"

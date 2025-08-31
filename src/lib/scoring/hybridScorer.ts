@@ -143,7 +143,7 @@ async function calculateSemanticSimilarity(targetUrl: string, generatedUrl: stri
       ]);
       
       // Poll for results with timeout
-      const pollResult = async (prediction: any, maxAttempts = 10) => {
+      const pollResult = async (prediction: Record<string, unknown>, maxAttempts = 10) => {
         let result = prediction;
         for (let i = 0; i < maxAttempts; i++) {
           if (result.status === 'succeeded' || result.status === 'failed') break;
@@ -162,8 +162,15 @@ async function calculateSemanticSimilarity(targetUrl: string, generatedUrl: stri
       ]);
       
       if (targetResult.status === 'succeeded' && genResult.status === 'succeeded') {
-        const targetEmb = targetResult.output?.embedding || targetResult.output;
-        const genEmb = genResult.output?.embedding || genResult.output;
+        const targetOutput = targetResult.output as Record<string, unknown> | unknown[] | undefined;
+        const genOutput = genResult.output as Record<string, unknown> | unknown[] | undefined;
+        
+        const targetEmb = (targetOutput && typeof targetOutput === 'object' && 'embedding' in targetOutput) 
+          ? targetOutput.embedding 
+          : targetOutput;
+        const genEmb = (genOutput && typeof genOutput === 'object' && 'embedding' in genOutput)
+          ? genOutput.embedding
+          : genOutput;
         
         if (Array.isArray(targetEmb) && Array.isArray(genEmb)) {
           const similarity = cosineSimilarity(targetEmb, genEmb);

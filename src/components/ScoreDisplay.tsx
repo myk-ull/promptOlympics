@@ -62,6 +62,7 @@ export function ScoreDisplay({ targetImage, generatedImage, scores, promptUsed }
             Target
           </h3>
           <div className="image-frame">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={targetImage} alt="Target" />
           </div>
         </div>
@@ -71,6 +72,7 @@ export function ScoreDisplay({ targetImage, generatedImage, scores, promptUsed }
             Your Result
           </h3>
           <div className="image-frame">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={generatedImage} alt="Generated" />
           </div>
         </div>
@@ -181,7 +183,7 @@ export function ScoreDisplay({ targetImage, generatedImage, scores, promptUsed }
           <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
             <p className="text-sm opacity-60 mb-2">Your prompt:</p>
             <p className="text-sm" style={{ fontStyle: 'italic', color: 'var(--text-secondary)' }}>
-              "{promptUsed}"
+              &ldquo;{promptUsed}&rdquo;
             </p>
           </div>
         )}
