@@ -1,17 +1,27 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
 let supabaseClient: SupabaseClient | null = null;
 
-if (supabaseUrl && supabaseAnonKey) {
+function getSupabaseClient(): SupabaseClient | null {
+  if (supabaseClient) {
+    return supabaseClient;
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    if (typeof window !== 'undefined') {
+      console.warn('Supabase environment variables not configured.');
+    }
+    return null;
+  }
+
   supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
-} else {
-  console.warn('Supabase environment variables not configured.');
+  return supabaseClient;
 }
 
-export const supabase = supabaseClient;
+export const supabase = getSupabaseClient();
 
 // Database types
 export interface User {
