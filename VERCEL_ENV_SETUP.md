@@ -21,6 +21,12 @@ https://lzrzoaxspilzkrqjrlwp.supabase.co
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6cnpvYXhzcGlsemtycWpybHdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2MzM3NjUsImV4cCI6MjA3MjIwOTc2NX0.Nnb-BGVXJkXk_mkgm1QMzBzS1cgKBtJhe9wM3w9e3tY
 ```
 
+#### NEXTAUTH_URL (for email confirmations)
+```
+https://your-project-name.vercel.app
+```
+Replace `your-project-name` with your actual Vercel project URL
+
 ### 3. Important Settings
 - **Environment**: Select all three checkboxes:
   - ✅ Production

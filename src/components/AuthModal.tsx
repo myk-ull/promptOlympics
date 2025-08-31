@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { EmailConfirmation } from './EmailConfirmation';
 
 interface AuthModalProps {
   onSuccess: () => void;
@@ -14,6 +15,7 @@ export function AuthModal({ onSuccess }: AuthModalProps) {
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +51,10 @@ export function AuthModal({ onSuccess }: AuthModalProps) {
             email,
             username: username || email.split('@')[0]
           });
+          // Show email confirmation instead of success
+          setShowEmailConfirmation(true);
+          setLoading(false);
+          return;
         }
       }
       onSuccess();
@@ -58,6 +64,18 @@ export function AuthModal({ onSuccess }: AuthModalProps) {
       setLoading(false);
     }
   };
+
+  if (showEmailConfirmation) {
+    return (
+      <EmailConfirmation 
+        email={email} 
+        onClose={() => {
+          setShowEmailConfirmation(false);
+          onSuccess();
+        }}
+      />
+    );
+  }
 
   return (
     <div className="modal-backdrop">
