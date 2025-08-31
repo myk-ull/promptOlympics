@@ -20,6 +20,12 @@ export function AuthModal({ onSuccess }: AuthModalProps) {
     setLoading(true);
     setError('');
 
+    if (!supabase) {
+      setError('Authentication service not configured');
+      setLoading(false);
+      return;
+    }
+
     try {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({

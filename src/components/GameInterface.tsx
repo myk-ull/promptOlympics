@@ -59,6 +59,10 @@ export function GameInterface() {
   };
 
   const checkAuthentication = async () => {
+    if (!supabase) {
+      console.warn('Supabase not configured, skipping authentication check');
+      return;
+    }
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       setUser(user);
@@ -159,7 +163,7 @@ export function GameInterface() {
             <div style={{ position: 'absolute', top: '50%', right: '1rem', transform: 'translateY(-50%)' }}>
               {user ? (
                 <button
-                  onClick={() => supabase.auth.signOut().then(() => setUser(null))}
+                  onClick={() => supabase?.auth.signOut().then(() => setUser(null))}
                   className="text-sm opacity-60"
                   style={{ textDecoration: 'none', cursor: 'pointer' }}
                 >
