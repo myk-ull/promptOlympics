@@ -4,6 +4,14 @@ import { getPuzzleForDate } from '@/lib/dailyPuzzles';
 
 export async function GET() {
   try {
+    // Check if Supabase is available
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not configured' },
+        { status: 503 }
+      );
+    }
+
     // Get today's date
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];

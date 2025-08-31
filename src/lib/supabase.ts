@@ -1,9 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+function getSupabaseClient() {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn('Supabase environment variables not configured. Using dummy client for build.');
+    return null;
+  }
+  return createClient(supabaseUrl, supabaseAnonKey);
+}
+
+export const supabase = getSupabaseClient()!;
 
 // Database types
 export interface User {

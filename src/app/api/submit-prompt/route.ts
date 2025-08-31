@@ -3,6 +3,14 @@ import { supabase } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if Supabase is available
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not configured' },
+        { status: 503 }
+      );
+    }
+
     // TODO: Add authentication back later
     // For now, just store submissions without user tracking
     
