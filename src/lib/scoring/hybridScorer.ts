@@ -38,6 +38,16 @@ export async function calculateEnsembleScore(
 ): Promise<ScoreBreakdown> {
   
   try {
+    console.log('=== SCORING DEBUG START ===');
+    console.log('Using: hybridScorer.ts');
+    console.log('Target URL:', targetImageUrl);
+    console.log('Generated URL:', generatedImageUrl);
+    console.log('Environment check:');
+    console.log('- REPLICATE_API_TOKEN set:', !!process.env.REPLICATE_API_TOKEN);
+    console.log('- Token length:', process.env.REPLICATE_API_TOKEN?.length || 0);
+    console.log('- Token preview:', process.env.REPLICATE_API_TOKEN ? `${process.env.REPLICATE_API_TOKEN.slice(0, 8)}...` : 'undefined');
+    console.log('- Server environment:', typeof window === 'undefined');
+    console.log('- Node.js env NODE_ENV:', process.env.NODE_ENV);
     console.log('Calculating hybrid similarity scores...');
     
     // Calculate multiple similarity metrics in parallel
@@ -53,6 +63,12 @@ export async function calculateEnsembleScore(
       structural: structuralScore 
     });
     
+    console.log('Score analysis:');
+    console.log('- All scores at 0.5?', semanticScore === 0.5 && perceptualScore === 0.5);
+    console.log('- Semantic using fallback:', semanticScore === 0.5);
+    console.log('- Perceptual using fallback:', perceptualScore === 0.5);
+    console.log('- Structural using hash method:', structuralScore !== 0.5);
+    
     // Weighted combination for final score
     // Semantic (what): 50%, Perceptual (style): 30%, Structural (composition): 20%
     const weights = {
@@ -67,6 +83,11 @@ export async function calculateEnsembleScore(
       (structuralScore * weights.structural);
     
     const finalScore = Math.round(weightedScore * 100);
+
+    console.log('Final calculation:');
+    console.log('- Weighted score:', weightedScore);
+    console.log('- Final score (0-100):', finalScore);
+    console.log('=== SCORING DEBUG END ===');
 
     return {
       similarity: weightedScore,
@@ -97,10 +118,17 @@ export async function calculateEnsembleScore(
 // Semantic similarity using CLIP (what is shown in the image)
 async function calculateSemanticSimilarity(targetUrl: string, generatedUrl: string): Promise<number> {
   try {
+    console.log('--- SEMANTIC SIMILARITY DEBUG ---');
     if (typeof window === 'undefined') {
       const apiToken = process.env.REPLICATE_API_TOKEN;
+      console.log('Semantic - API token check:', {
+        tokenExists: !!apiToken,
+        tokenLength: apiToken?.length || 0,
+        tokenType: typeof apiToken
+      });
+      
       if (!apiToken) {
-        console.error('REPLICATE_API_TOKEN not set');
+        console.error('SEMANTIC FALLBACK: REPLICATE_API_TOKEN not set');
         return 0.5;
       }
       
@@ -191,9 +219,16 @@ async function calculateSemanticSimilarity(targetUrl: string, generatedUrl: stri
 // Perceptual similarity using DreamSim (how the image looks - style, colors, composition)
 async function calculatePerceptualSimilarity(targetUrl: string, generatedUrl: string): Promise<number> {
   try {
+    console.log('--- PERCEPTUAL SIMILARITY DEBUG ---');
     if (typeof window === 'undefined') {
       const apiToken = process.env.REPLICATE_API_TOKEN;
+      console.log('Perceptual - API token check:', {
+        tokenExists: !!apiToken,
+        tokenLength: apiToken?.length || 0
+      });
+      
       if (!apiToken) {
+        console.error('PERCEPTUAL FALLBACK: REPLICATE_API_TOKEN not set');
         return 0.5;
       }
       
@@ -283,6 +318,9 @@ async function calculatePerceptualSimilarity(targetUrl: string, generatedUrl: st
 // This is a simplified version - in production, you'd use actual image processing
 async function calculateStructuralSimilarity(targetUrl: string, generatedUrl: string): Promise<number> {
   try {
+    console.log('--- STRUCTURAL SIMILARITY DEBUG ---');
+    console.log('Using hash-based structural similarity (fallback method)');
+    
     // For now, use a pseudo-random but consistent approach
     // In a real implementation, this would:
     // 1. Extract color histograms
